@@ -1,4 +1,4 @@
-//nvcc -O2 pointindexing_template.cu -o pointindexing -I /home/microway/cuda-samples/Common/
+//nvcc -O2 pointindexing_template.cu -o pointindexing -I ~/cuda-samples/Common/
 //./pointindexing  100 2 
 //./pointindexing  10000000 10  
 
