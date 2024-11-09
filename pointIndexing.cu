@@ -44,7 +44,7 @@ using namespace std;
 // "transforming...", "transferring to GPU..." when you run
 // ./pointindexing, in which it literally calculates how long it takes
 // in milliseconds
-float calc_time(char *msg,timeval t0, timeval t1)
+float calc_time(const char *msg,timeval t0, timeval t1)
 {
  	long d = t1.tv_sec*1000000+t1.tv_usec - t0.tv_sec * 1000000-t0.tv_usec;
  	float t=(float)d/1000;
@@ -175,16 +175,30 @@ int main(int argc, char *argv[]) {
     HANDLE_ERROR( cudaMemcpy( dptr_points, h_points, num_points * sizeof(point2d), cudaMemcpyHostToDevice ) ); 
     gettimeofday(&s2, NULL);    
     calc_time("transferring data to GPU\n",s1,s2);  
-        
+	// below converts the raw pointers into thrust pointers to take advantage of higher level thrust algorithms   
+   	// with thrust, you can work with sorting, reduction, transformation directly on device memory 
     thrust::device_ptr<point2d> d_points=thrust::device_pointer_cast(dptr_points);
     thrust::device_ptr<uint> d_cellids =thrust::device_pointer_cast(dptr_cellids);
     
+
+
+    // thrust::transform() params -> (execution policy, begining of input, end of input, beginning of output, operation)
     //====================================================================================================
     //YOUR WORK below: Step 1- transform point coordinates to cell identifiers; pay attention to functor xytor
-    //thrust::transform(...);
-    //====================================================================================================
-    //YOUR WORK below: Step 1- transform point coordinates to cell identifiers; pay attention to functor xytor
-    //thrust::transform(...);
+    // from what i understand here is to transform (x,y) from point2d() -> xytor?
+    // looking at the parameters transform() takes, I think this makes sense. we used the thrust'd (ayo) device_ptr's 
+    // in d_points and apply the xytor functor/operator. Note that we need to make an INSTANCE of xytor, since it is not callable
+    // because xytor is just an instantiated type
+
+    // ==== ANSWER ====
+
+    xytor xytor_operator(run_lev);
+    // assigning the policy -> device since that's where the GPU is, hence the use of thrust for taking advantage of the GPU 
+    thrust::transform(thrust::device, d_points, d_points + num_points, d_cellids, xytor_operator);
+    // ==== ANSWER ====
+    // cudaDeviceSynchronize() kind of "waits" until all CUDA operations on the GPU are complete, blocking the CPU
+    // in the process. this basically makes sure all the code coming after runs if and only if the GPU has successfully
+    // completed everything coming before without any errors.
     cudaDeviceSynchronize();
     gettimeofday(&s3, NULL);    
     calc_time("transforming..............\n",s2,s3);    
