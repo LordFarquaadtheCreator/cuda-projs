@@ -183,7 +183,7 @@ int main(int argc, char *argv[]) {
 
 
     // thrust::transform() params -> (execution policy, begining of input, end of input, beginning of output, operation)
-    //====================================================================================================
+    // S T E P - O N E TRANSFORMATION =====================================================================================
     //YOUR WORK below: Step 1- transform point coordinates to cell identifiers; pay attention to functor xytor
     // from what i understand here is to transform (x,y) from point2d() -> xytor?
     // looking at the parameters transform() takes, I think this makes sense. we used the thrust'd (ayo) device_ptr's 
@@ -203,8 +203,11 @@ int main(int argc, char *argv[]) {
     gettimeofday(&s3, NULL);    
     calc_time("transforming..............\n",s2,s3);    
     
-    //YOUR WORK below: Step 2- sort (cellid,point) pairs 
-    //thrust::stable_sort_by_key(...)
+    // S T E P - T W O SORT BY KEYS =============== ==================================== 
+    //YOUR WORK below: Step 2- sort (cellid,point) pairs
+    // here i'm assuming we are just sorting d_points (x,y coords) based on the cellid's they're assigned to. thats about it.
+    // if you want decreasing order, then you can add thrust::greater<int>() at the end 
+    thrust::stable_sort_by_key(d_cellids, d_cellids + num_points, d_points);
     cudaDeviceSynchronize();
     gettimeofday(&s4, NULL);    
     calc_time("sorting..............\n",s3,s4);
@@ -222,14 +225,17 @@ int main(int argc, char *argv[]) {
     
     //YOUR WORK below: Step 3- reduce by key 
     //use  d_cellids as the first input vector and thrust::constant_iterator<int>(1) as the second input
+    // using reduce_by_key() is a little weird here, but we treat the key and values like the sort_by_key function from my understanding
+    // the keys are d_cellids, start with thrust::constant_iterator<int>(1), and then the outputs are d_PKey and d_PLen
     size_t num_cells=0;//num_cells is initialized to 0 just to make the template compile; it should be updated next
-    // num_cells = thrust::reduce_by_key(...).first - d_PKey 	
+    num_cells = thrust::reduce_by_key(d_cellids, d_cellids + num_points, thrust::constant_iterator<int>(1), d_PKey, d_PLen).first - d_PKey;	
     cudaDeviceSynchronize();
     gettimeofday(&s5, NULL);
     calc_time("reducing.......\n",s4,s5);
     
     //YOUR WORK below: Step 4-  exclusive scan using d_PLen as the input and d_PPos as the output
-    //thrust::exclusive_scan(...)
+    // parameters are: execution policy, input_begin, input_end, output_begin, initial value, binary operation
+    thrust::exclusive_scan(thrust::device, d_PLen, d_PLen + num_cells, d_PPos);
     cudaDeviceSynchronize();
     gettimeofday(&s6, NULL);
     calc_time("scan.......\n",s5,s6); 
@@ -257,7 +263,11 @@ int main(int argc, char *argv[]) {
      	printf("(%d,%d)",p.x,p.y);
      }
     printf("\n");
-     
+   
+
+
+
+    // below just prints our results basicaly 
     cout<<"cell identifiers:";
     thrust::copy(h_cellids, h_cellids+point_out, std::ostream_iterator<uint>(std::cout, " "));       
     cout<<endl;
