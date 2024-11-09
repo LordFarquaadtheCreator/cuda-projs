@@ -1,6 +1,15 @@
-//nvcc -O2 pointindexing_template.cu -o pointindexing -I ~/cuda-samples/Common/
-//./pointindexing  100 2 
-//./pointindexing  10000000 10  
+//nvcc -O2 pointIndexing.cu -o pointindexing -I ~/cuda-samples/Common/
+// ./pointindexing  100 2 
+// ./pointindexing  10000000 10  
+// what we know about point indexing as a generalization:
+// point indexing's purpose seems to be to assign indices to points in a 2D space, 
+// maybe 3D space also, but 'struct point2d' seems to imply that it
+// is mostly just 2D space. this is basically where parallel computing 
+// comes in; once points are indexed like a grid, it is must easier for the GPU
+// to navigate and take advantage of algorithms that work with 2D spaces
+// read more on Morton Codes CUDA, and grid-based indexing
+
+
 
 #include <helper_functions.h>
 #include <helper_cuda.h>
@@ -29,6 +38,12 @@ typedef unsigned char uchar;
 
 using namespace std;
 
+// calculates time between t0 and t1 in milliseconds
+// tv_sec=seconds, tv_usec=microseconds
+// simply just understand this is used for the parts that say
+// "transforming...", "transferring to GPU..." when you run
+// ./pointindexing, in which it literally calculates how long it takes
+// in milliseconds
 float calc_time(char *msg,timeval t0, timeval t1)
 {
  	long d = t1.tv_sec*1000000+t1.tv_usec - t0.tv_sec * 1000000-t0.tv_usec;
@@ -38,6 +53,10 @@ float calc_time(char *msg,timeval t0, timeval t1)
  	return t;
 }
 
+
+// HandleError() only checks for runtime errors when calling CUDA API
+// doesn't catch compilation nor syntax errors
+// example errors would be failing to do cudaMalloc, cudaMemcpy, etc.
 static void HandleError( cudaError_t err,
                          const char *file,
                          int line ) {
@@ -49,6 +68,15 @@ static void HandleError( cudaError_t err,
 }
 #define HANDLE_ERROR( err ) (HandleError( err, __FILE__, __LINE__ ))
 
+// __host__ __device__ essentially means declaring a routine on host (CPU)
+// which is callable by the device (GPU)
+// source: https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#execution-configuration
+// (7.1.2 and 7.1.3)
+
+
+// point2d() is a default constructor; no inits, contains values in memory
+// point2d(ushort _x, ushort _y) is parameterized, takes two parameters
+// and sets x to _x, y to _y
 struct point2d
 {
     ushort x,y;
@@ -60,6 +88,17 @@ struct point2d
 
 };
 
+// i think the main idea of the xytor struct and the 
+// operator() functor is that the operator() takes a point2d
+// struct, and does the following:
+// x shifts its bits to the right by (16-lev) positions
+// this is also basically x / [2^(16-lev)] (same applies for b=y)
+// returns 1 but shifted to the left by lev positions
+// which is equivalent to 2^lev
+
+// not exactly sure what xytor means? i assume based on the code it means
+// X,Y to R as in Result?, and lev i'd assume is level, which is kind of
+// a configuration that you can play with in ref to x,y coords
 struct xytor
 {
 
@@ -131,6 +170,9 @@ int main(int argc, char *argv[])
     thrust::device_ptr<point2d> d_points=thrust::device_pointer_cast(dptr_points);
     thrust::device_ptr<uint> d_cellids =thrust::device_pointer_cast(dptr_cellids);
     
+    //====================================================================================================
+    //YOUR WORK below: Step 1- transform point coordinates to cell identifiers; pay attention to functor xytor
+    //thrust::transform(...);
     //====================================================================================================
     //YOUR WORK below: Step 1- transform point coordinates to cell identifiers; pay attention to functor xytor
     //thrust::transform(...);
@@ -216,6 +258,3 @@ int main(int argc, char *argv[])
     delete[] h_points;
     delete[] h_cellids;
     delete[] h_PKey;
-    delete[] h_PLen;
-    delete[] h_PPos;
-}
