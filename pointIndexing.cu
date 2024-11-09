@@ -258,3 +258,6 @@ int main(int argc, char *argv[])
     delete[] h_points;
     delete[] h_cellids;
     delete[] h_PKey;
+    delete[] h_PLen;
+    delete[] h_PPos;
+}
