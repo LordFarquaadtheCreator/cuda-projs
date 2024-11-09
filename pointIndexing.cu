@@ -121,14 +121,15 @@ struct xytor
 };
 
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
+	// makes sure that there are three arguments total
+	// (./pointindexing 30 100000 has 3 args)
     if (argc!=3)
     {
         printf("USAGE: %s #points lev(0<l<16)\n", argv[0]);
         exit(1);
     }
-	
+	// atoi -> ASCII to Integer (C function)    
     int num_points = atoi(argv[1]);
     if(num_points<0) num_points=10000;    
     printf("num_points=%d\n",num_points);
@@ -136,11 +137,13 @@ int main(int argc, char *argv[])
     int run_lev=atoi(argv[2]);
     if(run_lev<0) run_lev=10;    
     printf("run_lev=%d\n",run_lev);
-    
+   // initializes vector 'da' of 'num_points' unsigned int elements 
     vector<unsigned int> da(num_points);
     timeval s0, s1,s2,s3,s4,s5,s6,s7;
     
     //allocate host memory
+    // h_point is a point2d* pointer pointing to array of point2d elements of size num_points
+    // h_cellids is a uint* pointer pointing to uint array of size num_points
     point2d * h_points=new point2d[num_points];
     uint *h_cellids=new uint[num_points];
      
@@ -148,10 +151,16 @@ int main(int argc, char *argv[])
     uint *dptr_cellids=NULL;
     HANDLE_ERROR( cudaMalloc( (void**)&dptr_points,num_points* sizeof(point2d)));
     HANDLE_ERROR( cudaMalloc( (void**)&dptr_cellids,num_points* sizeof(uint)));
+    // below is kind of redundant when we've already checked for errors. ignore tbh
     assert(dptr_points!=NULL&&dptr_cellids!=NULL);
     
     //generate points
-    gettimeofday(&s0, NULL);    
+    // gettimeofday() should return 0, I assume it's then used to compare compile time 
+    // since the 00:00 time in milliseconds to measure how long it took
+    gettimeofday(&s0, NULL);
+
+    // as said in the next few lines, below really just makes up random x,y coords and then
+    // those coordinates will go to the ith element in the h_points array from line 147~ 
     for(int i=0;i<num_points;i++)
     {
     	point2d p;
@@ -165,7 +174,7 @@ int main(int argc, char *argv[])
     // copy point data from CPU host to GPU device 
     HANDLE_ERROR( cudaMemcpy( dptr_points, h_points, num_points * sizeof(point2d), cudaMemcpyHostToDevice ) ); 
     gettimeofday(&s2, NULL);    
-    calc_time("trnasferring data to GPU\n",s1,s2);  
+    calc_time("transferring data to GPU\n",s1,s2);  
         
     thrust::device_ptr<point2d> d_points=thrust::device_pointer_cast(dptr_points);
     thrust::device_ptr<uint> d_cellids =thrust::device_pointer_cast(dptr_cellids);
