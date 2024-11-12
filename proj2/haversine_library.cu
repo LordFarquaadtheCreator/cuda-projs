@@ -8,10 +8,14 @@ __global__ void haversine_distance_kernel(int size, const double *x1,const doubl
   double deltaLat = floor(*x1 - *x2);
   double deltaLong = floor(*y1 - *y2);
   double cosinesMultiplied = cos(*x1) * cos(*x2);
-  double sinDeltaLat = 2 * sin(deltaLat / 2) * cos(deltaLat / 2);
-  double sinDeltaLong = 2 * sin(deltaLong / 2) * cos(deltaLong / 2);
-
-  *dist = sinDeltaLat + cosinesMultiplied * sinDeltaLong;
+  double sinDeltaLat = 2.0 * sin(deltaLat / 2.0) * cos(deltaLat / 2.0);
+  double sinDeltaLong = 2.0 * sin(deltaLong / 2.0) * cos(deltaLong / 2.0);
+  
+  double a = sinDeltaLat + cosinesMultiplied * sinDeltaLong;
+  double R = 6378.0; // kilometers
+  double c = 2.0 * atan2(sqrt(a), sqrt((1.0 - a)));
+  
+  *dist = R * c;
   return;
 }
 
