@@ -2,18 +2,29 @@
 #include <iostream>
 #include <cuda_runtime.h>
 
-__global__ void haversine_distance_kernel(int size, const double *x1,const double *y1,
-    const double *x2,const double *y2, double *dist)
+__global__ void haversine_distance_kernel(int size, const double *x1, const double *y1,
+                                          const double *x2, const double *y2, double *dist)
 {
-  double deltaLat = floor(*x1 - *x2);
-  double deltaLong = floor(*y1 - *y2);
-  double cosinesMultiplied = cos(*x1) * cos(*x2);
-  double sinDeltaLat = 2 * sin(deltaLat / 2) * cos(deltaLat / 2);
-  double sinDeltaLong = 2 * sin(deltaLong / 2) * cos(deltaLong / 2);
+    int idx = threadIdx.x + blockIdx.x * blockDim.x;
+    if (idx >= size) return;
 
-  *dist = sinDeltaLat + cosinesMultiplied * sinDeltaLong;
-  return;
+    double lat1 = x1[idx];
+    double lon1 = y1[idx];
+    double lat2 = x2[idx];
+    double lon2 = y2[idx];
+
+    double R = 6378.0; 
+    double deltaLat = (lat2 - lat1) * (M_PI / 180.0); 
+    double deltaLon = (lon2 - lon1) * (M_PI / 180.0); 
+    double lat1Rad = lat1 * (M_PI / 180.0);
+    double lat2Rad = lat2 * (M_PI / 180.0);
+
+    double a = sin(deltaLat / 2.0) * sin(deltaLat / 2.0) +
+               cos(lat1Rad) * cos(lat2Rad) * sin(deltaLon / 2.0) * sin(deltaLon / 2.0);
+    double c = 2.0 * atan2(sqrt(a), sqrt(1.0 - a));
+    dist[idx] = R * c;
 }
+
 
 
 void run_kernel(int size, const double *x1,const double *y1, const double *x2,const double *y2, double *dist)
