@@ -57,17 +57,17 @@ void haversine_distance(int size,pybind11::array_t<double> x1_v,pybind11::array_
   HANDLE_ERROR( cudaMemcpy(d_x2, h_x2, size * sizeof(double), cudaMemcpyHostToDevice) );
   HANDLE_ERROR( cudaMemcpy(d_y2, h_y2, size * sizeof(double), cudaMemcpyHostToDevice) );
   gettimeofday(&s1, NULL);
-  calc_time("transferring from CPU to GPU\n", s0, s1);
+  calc_time("<--transferring data from CPU to GPU\n-->", s0, s1);
   //printf("before\n");
   // run the kernel
   run_kernel(size,d_x1,d_y1,d_x2,d_y2,d_dist);
   gettimeofday(&s2, NULL);
-  calc_time("running kernel\n", s1, s2);
+  calc_time("<--running the kernel\n-->", s1, s2);
   //printf("after\n");
   //transfer data back from device to host or gpu to cpu (cudaMemcpyDeviceToHost)
   HANDLE_ERROR( cudaMemcpy(h_dist, d_dist, size * sizeof(double), cudaMemcpyDeviceToHost) );
   gettimeofday(&s3, NULL);
-  calc_time("GPU to CPU\n", s2, s3);
+  calc_time("<--transferring data back GPU to CPU (host)\n-->", s2, s3);
 
   HANDLE_ERROR( cudaFree(d_x1) );
   HANDLE_ERROR( cudaFree(d_y1) );
