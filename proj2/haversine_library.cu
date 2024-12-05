@@ -7,24 +7,27 @@ __global__ void haversine_distance_kernel(int size, const double *x1, const doub
 {
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
     if (idx >= size) return;
+    
+    double lon1 = x1[idx];
+    double lat1 = y1[idx];
+    double lon2 = x2[idx];
+    double lat2 = y2[idx];
 
-    double lat1 = x1[idx];
-    double lon1 = y1[idx];
-    double lat2 = x2[idx];
-    double lon2 = y2[idx];
+    double R = 6371000.0;
 
-    double R = 6378.0; 
-    double deltaLat = (lat2 - lat1) * (M_PI / 180.0); 
-    double deltaLon = (lon2 - lon1) * (M_PI / 180.0); 
-    double lat1Rad = lat1 * (M_PI / 180.0);
-    double lat2Rad = lat2 * (M_PI / 180.0);
+    double phi_1 = lat1 * (M_PI / 180);
+    double phi_2 = lat2 * (M_PI / 180);
+    double delta_phi = (lat2 - lat1) * (M_PI / 180);
+    double delta_lambda = (lon2 - lon1) * (M_PI / 180);
+    
+    double a = pow(sin(delta_phi / 2.0), 2.0) + cos(phi_1) * cos(phi_2) * pow(sin(delta_lambda / 2.0), 2);
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    
+    double meters = (R * c);
+    double kilometers = meters / 1000.0;
 
-    double a = sin(deltaLat / 2.0) * sin(deltaLat / 2.0) +
-               cos(lat1Rad) * cos(lat2Rad) * sin(deltaLon / 2.0) * sin(deltaLon / 2.0);
-    double c = 2.0 * atan2(sqrt(a), sqrt(1.0 - a));
-
-    printf("The haversine distance is: %f\n", R * c);
-    dist[idx] = R * c;
+    // printf("The haversine distance is: %f\n",kilometers);
+    dist[idx] = kilometers;
 }
 
 
