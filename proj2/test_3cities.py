@@ -23,19 +23,17 @@ print("y1: ", y1)
 print("x2: ", x2)
 print("y2: ", y2)
 
+true = [
+        0.0,
+        5.83724090e03,
+        1.59887555e04,
+        5.83724090e03,
+        0.0,
+        1.69604974e04,
+        1.59887555e04,
+        1.69604974e04,
+        0.0,
+    ]
 haversine_library.haversine_distance(size,x1,y1,x2,y2,dist)
 
-print("dist: ", dist)
-
-assert np.allclose(dist,[
-                0.0,
-                5.83724090e03,
-                1.59887555e04,
-                5.83724090e03,
-                0.0,
-                1.69604974e04,
-                1.59887555e04,
-                1.69604974e04,
-                0.0,
-            ]
-    )
+assert np.allclose(dist, true)
