@@ -13,8 +13,6 @@ __global__ void haversine_distance_kernel(int size, const double *x1, const doub
     double lat2 = x2[idx];
     double lon2 = y2[idx];
 
-    printf("These are the values: %f, %f, %f, %f\n", lat1, lon1, lat2, lon2);
-
     double R = 6378.0; 
     double deltaLat = (lat2 - lat1) * (M_PI / 180.0); 
     double deltaLon = (lon2 - lon1) * (M_PI / 180.0); 
