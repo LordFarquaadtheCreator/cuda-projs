@@ -1,6 +1,10 @@
+import sys
+sys.path.append('./build')
+
+from haversine_library import haversine_distance
 import cudf
 import numpy as np
-from haversine_library import haversine_library#<--- this doesnt work
+
 
 NYC_BOUNDING_BOX = [-74.15, 40.5774, -73.7004, 40.9176] #see dosc for more info
 
@@ -13,10 +17,10 @@ def filter_nyc(df):
     ]
 
 #the loop
-file_paths = [f'tlcdata/yellow_tripdata_2009-{str(i).zfill(2)}.parquet' for i in range(1, 13)]
+file_paths = [f'yellowcab_2009/yellow_tripdata_2009-{str(i).zfill(2)}.parquet' for i in range(1, 13)]
 dfs = []
 for file_path in file_paths:
-    for chunk in cudf.read_parquet(file_path, chunksize=100000): #this might be a cause of error. need to look more into it
+    for chunk in cudf.read_parquet(file_path):
         df_filtered = filter_nyc(chunk)
         dfs.append(df_filtered)
 
