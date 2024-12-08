@@ -9,3 +9,4 @@ Miniconda3.sh
 cufile.log
 .vscode
 __pycache__/
+*.docx#
