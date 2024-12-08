@@ -10,6 +10,7 @@ class question4:
     def __init__(self):
         self.main_df = cu.DataFrame()
         self.x1, self.x2, self.y1, self.y2 = None, None, None, None
+        self.dist = None
 
     def make_big_df(self):
         DIR = "/data/csc59866_f24/tlcdata/" 
@@ -38,10 +39,10 @@ class question4:
     @timer
     def cuda_haversine(self):
         size=len(self.x1)
-        dist=np.zeros(size)
-        haversine_library.haversine_distance(size, self.x1, self.y1, self.x2, self.y2, dist) 
+        self.dist=np.zeros(size)
+        haversine_library.haversine_distance(size, self.x1, self.y1, self.x2, self.y2, self.dist) 
 
-        assert len(dist) == size
+        assert len(self.dist) == size
         print("CUDA Havertsine Distances Calculated!")
 
     @timer
@@ -54,9 +55,41 @@ class question4:
 
         assert len(distances) == size
         print("Python Haversine Distances Calculated!")
+    
+    def draw_histograms(self):
+        import matplotlib.pyplot as plt
+        fig, axs = plt.subplots(5, 1, figsize=(10, 20), tight_layout=True)
+
+        axs[0].hist(self.x1, bins=50, color='blue', alpha=0.7)
+        axs[0].set_title('Histogram of Start_Lon')
+        axs[0].set_xlabel('Longitude')
+        axs[0].set_ylabel('Frequency')
+
+        axs[1].hist(self.y1, bins=50, color='green', alpha=0.7)
+        axs[1].set_title('Histogram of Start_Lat')
+        axs[1].set_xlabel('Latitude')
+        axs[1].set_ylabel('Frequency')
+
+        axs[2].hist(self.x2, bins=50, color='red', alpha=0.7)
+        axs[2].set_title('Histogram of End_Lon')
+        axs[2].set_xlabel('Longitude')
+        axs[2].set_ylabel('Frequency')
+
+        axs[3].hist(self.y2, bins=50, color='orange', alpha=0.7)
+        axs[3].set_title('Histogram of End_Lat')
+        axs[3].set_xlabel('Latitude')
+        axs[3].set_ylabel('Frequency')
+
+        axs[4].hist(self.dist, bins=50, color='purple', alpha=0.7)
+        axs[4].set_title('Histogram of Distances')
+        axs[4].set_xlabel('Distance')
+        axs[4].set_ylabel('Frequency')
+
+        plt.savefig("bonus.png")
 
 if __name__ == "__main__":
     q = question4()
     q.make_big_df()
     q.cuda_haversine()
-    q.cpu_haversine()
+    # q.cpu_haversine()
+    q.draw_histograms()
