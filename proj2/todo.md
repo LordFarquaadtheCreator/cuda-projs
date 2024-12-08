@@ -1,17 +1,17 @@
 # TODO
 - [x] Implement `haversine_distance` function in `haversine_library.cu`
 - [ ] Modify `haversine_distance` using provided `calc_time(...)` function to measure runtimes of 
-    - [ ] GPU memory allocation
-    - [ ] CPU -> GPU data transfer
-    - [ ] runnin gthe kernel
-    - [ ] GPU -> CPU data transfer
+    - [x] GPU memory allocation
+    - [x] CPU -> GPU data transfer
+    - [x] runnin gthe kernel
+    - [x] GPU -> CPU data transfer
 - [x] run `test_3cities.py` to verify assertion passes
 - [x] download 12 months of 2019 TLC yellow cab data
 - [x] filter out start and end locations that are NOT in NYC 
 - [x] combine the dataframes into a single large dataframe
 - [x] convert `[Start_Lon, Start_Lat, End_Lon, End_Lat]` columns to numpy arrays
 - [x] call the previously made haversine function on the arrays to find the distance between each pickup and dropoff
-- [ ] re-implement haversine distance function in python
-    - [ ] apply python haversine to the numpy arrays 
-    - [ ] measure runtime compared to the cuda code we wrote earlier
+- [x] re-implement haversine distance function in python
+    - [x] apply python haversine to the numpy arrays 
+    - [x] measure runtime compared to the cuda code we wrote earlier
 - [ ] (bonus) create histograms using matplotlib
