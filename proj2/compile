@@ -1,6 +1,6 @@
 # /bin/bash
 
 cd build
-cmake ../
-make
+cmake ../ 1> /dev/null
+make 1> /dev/null
 cd ../
