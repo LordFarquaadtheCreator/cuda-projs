@@ -33,7 +33,6 @@ __global__ void haversine_distance_kernel(int size, const double *x1, const doub
 
 
 void run_kernel(int size, const double *x1,const double *y1, const double *x2,const double *y2, double *dist)
-   
 {
   dim3 dimBlock(1024);
   printf("in run_kernel dimBlock.x=%d\n",dimBlock.x);
