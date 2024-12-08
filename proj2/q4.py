@@ -59,4 +59,4 @@ if __name__ == "__main__":
     q = question4()
     q.make_big_df()
     q.cuda_haversine()
-    # q.cpu_haversine()
+    q.cpu_haversine()
