@@ -8,3 +8,4 @@ proj2/tlcdata
 Miniconda3.sh
 cufile.log
 .vscode
+__pycache__/
