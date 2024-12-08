@@ -6,11 +6,11 @@
     - [ ] runnin gthe kernel
     - [ ] GPU -> CPU data transfer
 - [x] run `test_3cities.py` to verify assertion passes
-- [ ] download 12 months of 2019 TLC yellow cab data
-- [ ] filter out start and end locations that are NOT in NYC 
-- [ ] combine the dataframes into a single large dataframe
-- [ ] convert `[Start_Lon, Start_Lat, End_Lon, End_Lat]` columns to numpy arrays
-- [ ] call the previously made haversine function on the arrays to find the distance between each pickup and dropoff
+- [x] download 12 months of 2019 TLC yellow cab data
+- [x] filter out start and end locations that are NOT in NYC 
+- [x] combine the dataframes into a single large dataframe
+- [x] convert `[Start_Lon, Start_Lat, End_Lon, End_Lat]` columns to numpy arrays
+- [x] call the previously made haversine function on the arrays to find the distance between each pickup and dropoff
 - [ ] re-implement haversine distance function in python
     - [ ] apply python haversine to the numpy arrays 
     - [ ] measure runtime compared to the cuda code we wrote earlier
